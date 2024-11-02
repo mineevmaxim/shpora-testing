@@ -1,39 +1,40 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using NUnit.Framework.Legacy;
 
 namespace HomeExercise.Tasks.ObjectComparison;
 public class ObjectComparison
 {
+    private Person actualTsar;
+    private Person expectedTsar;
+
+    [SetUp]
+    public void Setup()
+    {
+        actualTsar = TsarRegistry.GetCurrentTsar();
+        expectedTsar = CreateDefaultTsar();
+    }
+    
     [Test]
     [Description("Проверка текущего царя")]
     [Category("ToRefactor")]
     public void CheckCurrentTsar()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
+        actualTsar.Name.Should().Be(expectedTsar.Name);
+        actualTsar.Age.Should().Be(expectedTsar.Age);
+        actualTsar.Height.Should().Be(expectedTsar.Height);
+        actualTsar.Weight.Should().Be(expectedTsar.Weight);
 
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
-        // Перепишите код на использование Fluent Assertions.
-        ClassicAssert.AreEqual(actualTsar.Name, expectedTsar.Name);
-        ClassicAssert.AreEqual(actualTsar.Age, expectedTsar.Age);
-        ClassicAssert.AreEqual(actualTsar.Height, expectedTsar.Height);
-        ClassicAssert.AreEqual(actualTsar.Weight, expectedTsar.Weight);
-
-        ClassicAssert.AreEqual(expectedTsar.Parent!.Name, actualTsar.Parent!.Name);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Age, actualTsar.Parent.Age);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Height, actualTsar.Parent.Height);
-        ClassicAssert.AreEqual(expectedTsar.Parent.Parent, actualTsar.Parent.Parent);
+        actualTsar.Parent!.Name.Should().Be(expectedTsar.Parent!.Name);
+        actualTsar.Parent.Age.Should().Be(expectedTsar.Parent.Age);
+        actualTsar.Parent.Height.Should().Be(expectedTsar.Parent.Height);
+        actualTsar.Parent.Parent.Should().Be(expectedTsar.Parent.Parent);
     }
 
     [Test]
     [Description("Альтернативное решение. Какие у него недостатки?")]
     public void CheckCurrentTsar_WithCustomEquality()
     {
-        var actualTsar = TsarRegistry.GetCurrentTsar();
-        var expectedTsar = new Person("Ivan IV The Terrible", 54, 170, 70,
-            new Person("Vasili III of Russia", 28, 170, 60, null));
-
         // Какие недостатки у такого подхода? 
         ClassicAssert.True(AreEqual(actualTsar, expectedTsar));
     }
@@ -49,4 +50,10 @@ public class ObjectComparison
             && actual.Weight == expected.Weight
             && AreEqual(actual.Parent, expected.Parent);
     }
+    
+    private static Person CreateDefaultTsar()
+        => new ("Ivan IV The Terrible", 54, 170, 70, CreateDefaultParent());
+
+    private static Person CreateDefaultParent()
+        => new ("Vasili III of Russia", 28, 170, 60, null);
 }
