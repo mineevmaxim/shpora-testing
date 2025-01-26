@@ -9,3 +9,4 @@ public class TsarRegistry
             new Person("Vasili III of Russia", 28, 170, 60, null));
     }
 }
+
